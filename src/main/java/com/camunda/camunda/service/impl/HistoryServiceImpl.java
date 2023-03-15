@@ -1,6 +1,11 @@
 package com.camunda.camunda.service.impl;
 
-import org.apache.http.client.utils.URIBuilder;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -41,9 +46,20 @@ public class HistoryServiceImpl implements HistoryService {
 	private GenericRestCalls genericRestCalls;
 
 	@Override
-	public void persistHistoryActivityInstanceUsingPOST(HistoryActivityInstanceRequest historyActivityInstanceRequest) {
+	public void persistHistoryActivityInstanceUsingPOST(HistoryActivityInstanceRequest historyActivityInstanceRequest)
+			throws URISyntaxException {
 
 		try {
+
+			Map<String, Object> parameters = new LinkedHashMap<String, Object>();
+			JSONObject jsonObject = (JSONObject) new JSONParser()
+					.parse(OBJECT_MAPPER.writeValueAsString(historyActivityInstanceRequest));
+			for (Object obj : jsonObject.keySet()) {
+				String param = (String) obj;
+				parameters.put(param, jsonObject.get(param));
+			}
+
+			historyActivityInstanceUrl = appendToUrl(historyActivityInstanceUrl, parameters);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
@@ -64,5 +80,26 @@ public class HistoryServiceImpl implements HistoryService {
 		} catch (JsonProcessingException | ParseException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public String appendToUrl(String url, Map<String, Object> parameters) throws URISyntaxException {
+		URI uri = new URI(url);
+		String query = uri.getQuery();
+
+		StringBuilder builder = new StringBuilder();
+
+		if (query != null)
+			builder.append(query);
+
+		for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+			String keyValueParam = entry.getKey() + "=" + entry.getValue();
+			if (!builder.toString().isEmpty())
+				builder.append("&");
+
+			builder.append(keyValueParam);
+		}
+
+		URI newUri = new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), builder.toString(), uri.getFragment());
+		return newUri.toString();
 	}
 }

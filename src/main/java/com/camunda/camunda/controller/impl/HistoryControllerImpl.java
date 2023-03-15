@@ -1,5 +1,7 @@
 package com.camunda.camunda.controller.impl;
 
+import java.net.URISyntaxException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,7 @@ public class HistoryControllerImpl implements HistoryController {
 
 	@Override
 	public ResponseEntity<?> persistHistoryActivityInstanceUsingPOST(
-			HistoryActivityInstanceRequest historyActivityInstanceRequest) {
+			HistoryActivityInstanceRequest historyActivityInstanceRequest) throws URISyntaxException {
 
 		historyService.persistHistoryActivityInstanceUsingPOST(historyActivityInstanceRequest);
 		return ResponseEntity.status(HttpStatus.OK).body(new ModelMap().addAttribute("msg", "Success"));

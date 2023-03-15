@@ -1,5 +1,7 @@
 package com.camunda.camunda.controller;
 
+import java.net.URISyntaxException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,6 @@ public interface HistoryController {
 	@RequestMapping(value = { "/v1.0/history/activity-instance" }, produces = {
 			"application/json" }, method = RequestMethod.POST)
 	public ResponseEntity<?> persistHistoryActivityInstanceUsingPOST(
-			@RequestBody HistoryActivityInstanceRequest historyActivityInstanceRequest);
+			@RequestBody HistoryActivityInstanceRequest historyActivityInstanceRequest) throws URISyntaxException;
 
 }
